@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Swamp Grabber</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --panel: #0e2b1c;
+    --panel-light: #163a26;
+    --ink: #d8f7c8;
+    --accent: #ffd23f;
+    --accent-dark: #b3860b;
+    --frog: #4caf50;
+    --danger: #e05252;
+    --border: #05130a;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; height:100%;
+    background:#04160e;
+    color:var(--ink);
+    font-family:'Press Start 2P', 'Courier New', monospace;
+    overflow-x:hidden;
+  }
+  #bg{
+    position:fixed; inset:0; width:100%; height:100%;
+    z-index:0; display:block;
+    image-rendering: pixelated;
+  }
+  .wrap{
+    position:relative; z-index:1;
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center;
+    padding:20px 12px 60px;
+  }
+  .title{
+    font-size: clamp(18px, 5vw, 30px);
+    color: var(--accent);
+    text-shadow: 3px 3px 0 var(--border), 6px 6px 0 rgba(0,0,0,.3);
+    letter-spacing: 2px;
+    text-align:center;
+    margin: 10px 0 4px;
+  }
+  .subtitle{
+    font-size: 10px;
+    color: var(--ink);
+    opacity:.8;
+    text-align:center;
+    margin-bottom: 22px;
+  }
+  .panel{
+    width:100%; max-width: 520px;
+    background: var(--panel);
+    border: 4px solid var(--border);
+    box-shadow:
+      0 0 0 4px var(--panel-light) inset,
+      8px 8px 0 rgba(0,0,0,.45);
+    padding: 18px;
+    margin-bottom: 22px;
+  }
+  .row{
+    display:flex; gap:8px; flex-wrap:wrap;
+  }
+  input[type=text]{
+    flex: 1 1 200px;
+    font-family: inherit;
+    font-size: 11px;
+    padding: 14px 10px;
+    background: #04160e;
+    color: var(--ink);
+    border: 3px solid var(--border);
+    outline: none;
+  }
+  input[type=text]:focus{
+    border-color: var(--accent);
+  }
+  button{
+    font-family: inherit;
+    font-size: 11px;
+    cursor:pointer;
+    padding: 14px 16px;
+    color: var(--border);
+    background: var(--accent);
+    border: 3px solid var(--border);
+    box-shadow: 4px 4px 0 rgba(0,0,0,.45);
+    white-space: nowrap;
+    touch-action: manipulation;
+  }
+  button:active{
+    box-shadow: 1px 1px 0 rgba(0,0,0,.45);
+    transform: translate(3px,3px);
+  }
+  button.small{
+    font-size: 9px;
+    padding: 10px 10px;
+  }
+  button.danger{ background: var(--danger); color: #fff; }
+  button:disabled{ opacity:.5; cursor:default; }
+
+  .progress-wrap{ margin-top:16px; display:none; }
+  .progress-wrap.show{ display:block; }
+  .status-line{
+    font-size: 9px; margin-bottom:8px; opacity:.9;
+    display:flex; justify-content:space-between;
+  }
+  .bar{
+    display:flex; gap:2px; height:20px;
+    border:3px solid var(--border); padding:2px; background:#04160e;
+  }
+  .bar span{
+    flex:1; background: transparent;
+  }
+  .bar span.on{ background: var(--frog); }
+  .error-msg{
+    color: var(--danger); font-size:9px; margin-top:10px; display:none;
+  }
+  .error-msg.show{ display:block; }
+
+  .section-title{
+    font-size: 13px; color: var(--accent); margin-bottom: 14px;
+  }
+  .empty{
+    font-size: 10px; opacity:.7; line-height:1.8;
+  }
+  .video-item{
+    border: 3px solid var(--border);
+    background: var(--panel-light);
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  .video-name{
+    font-size: 9px; line-height:1.6; word-break: break-word; margin-bottom:8px;
+  }
+  .video-meta{
+    font-size: 8px; opacity:.7; margin-bottom: 10px;
+  }
+  .video-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+  .video-actions a{ text-decoration:none; }
+
+  #modal{
+    position:fixed; inset:0; z-index:10;
+    background: rgba(2,10,6,.92);
+    display:none; align-items:center; justify-content:center;
+    padding: 16px;
+  }
+  #modal.show{ display:flex; }
+  .player-box{
+    width:100%; max-width: 800px;
+    border: 4px solid var(--border);
+    box-shadow: 0 0 0 4px var(--panel-light) inset;
+    background:#000;
+    padding: 4px;
+  }
+  .player-box video{ width:100%; display:block; max-height:70vh; background:#000; }
+  .modal-close{
+    display:block; margin: 14px auto 0;
+  }
+
+  footer{
+    position:relative; z-index:1;
+    font-size: 8px; opacity:.55; text-align:center; padding: 10px;
+  }
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<div class="wrap">
+  <div class="title">SWAMP&nbsp;GRABBER</div>
+  <div class="subtitle">paste a link. catch the video. watch it anywhere.</div>
+
+  <div class="panel">
+    <div class="row">
+      <input id="url" type="text" placeholder="https://... video link" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button id="downloadBtn">⬇ GRAB</button>
+    </div>
+    <div class="progress-wrap" id="progressWrap">
+      <div class="status-line">
+        <span id="statusText">queued</span>
+        <span id="percentText">0%</span>
+      </div>
+      <div class="bar" id="bar"></div>
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <div class="panel">
+    <div class="section-title">YOUR SWAMP LIBRARY</div>
+    <div id="videoList"><div class="empty">no videos yet... go catch one!</div></div>
+  </div>
+
+  <footer>runs locally &middot; files live in /downloads</footer>
+</div>
+
+<div id="modal">
+  <div>
+    <div class="player-box">
+      <video id="player" controls playsinline></video>
+    </div>
+    <button class="modal-close" id="closeModal">✕ CLOSE</button>
+  </div>
+</div>
+
+<script>
+/* ---------- swamp background animation (original pixel art) ---------- */
+(function(){
+  const canvas = document.getElementById('bg');
+  const ctx = canvas.getContext('2d');
+  let W, H, UNIT;
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    UNIT = Math.max(3, Math.round(Math.min(W, H) / 90));
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function px(x, y, w, h, color){
+    ctx.fillStyle = color;
+    ctx.fillRect(Math.round(x/UNIT)*UNIT, Math.round(y/UNIT)*UNIT, Math.ceil(w/UNIT)*UNIT, Math.ceil(h/UNIT)*UNIT);
+  }
+
+  // fireflies
+  const fireflies = Array.from({length: 18}, () => ({
+    x: Math.random(), y: Math.random()*0.55,
+    phase: Math.random()*Math.PI*2, speed: 0.6+Math.random()*0.8
+  }));
+
+  // lily pads (position as fraction of width, sit on the river)
+  const pads = [0.12, 0.30, 0.48, 0.66, 0.84].map((x,i) => ({
+    x, bob: Math.random()*Math.PI*2, size: 2.4 + (i%2)*0.6
+  }));
+
+  // reeds along the bottom edges
+  const reeds = [];
+  for(let i=0;i<14;i++){
+    reeds.push({x: Math.random(), h: 3+Math.random()*4, side: Math.random()<0.5?0:1});
+  }
+
+  // frogs: sit on a pad index, hop to another occasionally
+  const FROG_COLORS = ['#4caf50', '#3f9142', '#5fc766'];
+  const frogs = [0,1,2].map((n,i) => ({
+    from: i % pads.length,
+    to: i % pads.length,
+    t: 1,               // 0..1 progress of current hop, 1 = resting
+    waitUntil: performance.now() + 1000 + Math.random()*4000,
+    color: FROG_COLORS[i % FROG_COLORS.length],
+    facing: 1
+  }));
+
+  const ripples = [];
+
+  function padPos(pad){
+    const riverTop = H*0.62;
+    return {
+      x: pad.x * W,
+      y: riverTop + (H - riverTop) * 0.35 + Math.sin(performance.now()/700 + pad.bob) * UNIT
+    };
+  }
+
+  function drawFrog(cx, cy, scale, color, squash){
+    // simple original blocky frog, drawn from unit blocks
+    const s = UNIT * scale;
+    const bodyW = 5*s, bodyH = (3*s) * squash;
+    const x0 = cx - bodyW/2, y0 = cy - bodyH;
+    // body
+    px(x0, y0, bodyW, bodyH, color);
+    // belly
+    px(x0 + s, y0 + bodyH - s, bodyW - 2*s, s, '#eaffdf');
+    // eyes (bumps on top)
+    px(x0 + s*0.5, y0 - s*0.8, s*1.1, s*1.1, color);
+    px(x0 + bodyW - s*1.6, y0 - s*0.8, s*1.1, s*1.1, color);
+    px(x0 + s*0.75, y0 - s*0.55, s*0.5, s*0.5, '#0a1a0a');
+    px(x0 + bodyW - s*1.35, y0 - s*0.55, s*0.5, s*0.5, '#0a1a0a');
+    // legs
+    px(x0 - s*0.6, y0 + bodyH - s*0.8, s*0.8, s*0.8, color);
+    px(x0 + bodyW - s*0.2, y0 + bodyH - s*0.8, s*0.8, s*0.8, color);
+  }
+
+  function step(ts){
+    // sky gradient
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0, '#081a12');
+    g.addColorStop(0.6, '#0a2417');
+    g.addColorStop(1, '#0f3320');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+
+    // fireflies
+    fireflies.forEach(f => {
+      const alpha = 0.35 + 0.5 * Math.abs(Math.sin(ts/600 * f.speed + f.phase));
+      ctx.fillStyle = `rgba(255, 230, 140, ${alpha.toFixed(2)})`;
+      const fx = f.x * W + Math.sin(ts/1500 + f.phase)*UNIT*3;
+      const fy = f.y * H + Math.cos(ts/1800 + f.phase)*UNIT*2;
+      ctx.fillRect(Math.round(fx/UNIT)*UNIT, Math.round(fy/UNIT)*UNIT, UNIT, UNIT);
+    });
+
+    // distant reeds/cattails
+    reeds.forEach(r => {
+      const baseY = H;
+      const rx = r.x * W;
+      const rh = r.h * UNIT * 3;
+      px(rx, baseY - rh, UNIT, rh, '#123d24');
+      px(rx - UNIT, baseY - rh*0.6, UNIT, rh*0.6, '#0d2e1a');
+      px(rx - UNIT*0.5, baseY - rh - UNIT*2, UNIT*2, UNIT*2, '#2f5a1f');
+    });
+
+    // river band
+    const riverTop = H * 0.62;
+    px(0, riverTop, W, H - riverTop, '#0c3348');
+    const stripeW = UNIT * 6;
+    const offset = (ts/40) % (stripeW*2);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, riverTop, W, H - riverTop);
+    ctx.clip();
+    for(let x = -stripeW*2 + offset; x < W + stripeW*2; x += stripeW*2){
+      px(x, riverTop + UNIT*2, stripeW, UNIT, '#134a63');
+      px(x + stripeW, riverTop + UNIT*5, stripeW, UNIT, '#0f3d55');
+      px(x + stripeW*0.5, riverTop + UNIT*9, stripeW, UNIT, '#134a63');
+    }
+    ctx.restore();
+
+    // lily pads
+    pads.forEach(pad => {
+      const p = padPos(pad);
+      const r = UNIT * pad.size;
+      px(p.x - r, p.y - r*0.4, r*2, r*0.8, '#2f7a34');
+      px(p.x - r*0.6, p.y - r*0.55, r*1.2, r*0.3, '#3f9142');
+    });
+
+    // ripples
+    for(let i = ripples.length-1; i>=0; i--){
+      const rp = ripples[i];
+      rp.r += 0.6;
+      rp.life -= 0.02;
+      if(rp.life <= 0){ ripples.splice(i,1); continue; }
+      ctx.strokeStyle = `rgba(200,240,255,${rp.life})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(rp.x, rp.y, rp.r*UNIT, 0, Math.PI*2);
+      ctx.stroke();
+    }
+
+    // frogs: state machine (idle -> hop -> idle)
+    frogs.forEach(frog => {
+      if(frog.t >= 1 && ts > frog.waitUntil){
+        frog.from = frog.to;
+        let next = frog.to;
+        while(next === frog.from) next = Math.floor(Math.random()*pads.length);
+        frog.facing = next > frog.from ? 1 : -1;
+        frog.to = next;
+        frog.t = 0;
+        frog.hopStart = ts;
+      }
+      let squash = 1, cx, cy;
+      const a = padPos(pads[frog.from]);
+      const b = padPos(pads[frog.to]);
+      if(frog.t < 1){
+        frog.t = Math.min(1, (ts - frog.hopStart) / 500);
+        const arc = Math.sin(frog.t * Math.PI) * UNIT * 6;
+        cx = a.x + (b.x - a.x) * frog.t;
+        cy = a.y + (b.y - a.y) * frog.t - arc;
+        squash = 0.75 + Math.sin(frog.t*Math.PI)*0.25;
+        if(frog.t >= 1){
+          frog.waitUntil = ts + 1500 + Math.random()*4000;
+          ripples.push({x: b.x, y: b.y, r: 0.5, life: 0.6});
+        }
+      } else {
+        cx = a.x; cy = a.y;
+        squash = 1 + Math.sin(ts/300)*0.03;
+      }
+      drawFrog(cx, cy, 1.4, frog.color, squash);
+    });
+
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+})();
+
+/* ---------- app logic ---------- */
+const urlInput = document.getElementById('url');
+const downloadBtn = document.getElementById('downloadBtn');
+const progressWrap = document.getElementById('progressWrap');
+const statusText = document.getElementById('statusText');
+const percentText = document.getElementById('percentText');
+const bar = document.getElementById('bar');
+const errorMsg = document.getElementById('errorMsg');
+const videoList = document.getElementById('videoList');
+const modal = document.getElementById('modal');
+const player = document.getElementById('player');
+
+const BAR_SEGMENTS = 24;
+for(let i=0;i<BAR_SEGMENTS;i++){
+  const s = document.createElement('span');
+  bar.appendChild(s);
+}
+
+function setBar(percent){
+  const filled = Math.round((percent/100) * BAR_SEGMENTS);
+  [...bar.children].forEach((el, i) => el.classList.toggle('on', i < filled));
+}
+
+function fmtSize(bytes){
+  if(bytes > 1024*1024*1024) return (bytes/1024/1024/1024).toFixed(2) + ' GB';
+  return (bytes/1024/1024).toFixed(1) + ' MB';
+}
+
+async function loadVideos(){
+  const res = await fetch('/api/videos');
+  const videos = await res.json();
+  if(!videos.length){
+    videoList.innerHTML = '<div class="empty">no videos yet... go catch one!</div>';
+    return;
+  }
+  videoList.innerHTML = '';
+  videos.forEach(v => {
+    const item = document.createElement('div');
+    item.className = 'video-item';
+    item.innerHTML = `
+      <div class="video-name">${v.name}</div>
+      <div class="video-meta">${fmtSize(v.size)}</div>
+      <div class="video-actions">
+        <button class="small watch-btn">▶ WATCH</button>
+        <a href="/videos/${encodeURIComponent(v.name)}" download="${v.name}"><button class="small">⭳ SAVE</button></a>
+        <button class="small danger del-btn">✕ DELETE</button>
+      </div>
+    `;
+    item.querySelector('.watch-btn').addEventListener('click', () => {
+      player.src = '/videos/' + encodeURIComponent(v.name);
+      modal.classList.add('show');
+      player.play().catch(()=>{});
+    });
+    item.querySelector('.del-btn').addEventListener('click', async () => {
+      if(!confirm('Delete this video?')) return;
+      await fetch('/api/videos/' + encodeURIComponent(v.name), {method:'DELETE'});
+      loadVideos();
+    });
+    videoList.appendChild(item);
+  });
+}
+
+document.getElementById('closeModal').addEventListener('click', () => {
+  modal.classList.remove('show');
+  player.pause();
+  player.removeAttribute('src');
+  player.load();
+});
+modal.addEventListener('click', (e) => { if(e.target === modal) document.getElementById('closeModal').click(); });
+
+let polling = null;
+
+downloadBtn.addEventListener('click', async () => {
+  const url = urlInput.value.trim();
+  errorMsg.classList.remove('show');
+  if(!url) return;
+
+  downloadBtn.disabled = true;
+  progressWrap.classList.add('show');
+  statusText.textContent = 'queued';
+  percentText.textContent = '0%';
+  setBar(0);
+
+  try {
+    const res = await fetch('/api/download', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({url})
+    });
+    const data = await res.json();
+    if(!res.ok){
+      throw new Error(data.error || 'could not start download');
+    }
+    poll(data.job_id);
+  } catch(err){
+    showError(err.message);
+    downloadBtn.disabled = false;
+    progressWrap.classList.remove('show');
+  }
+});
+
+function showError(msg){
+  errorMsg.textContent = '⚠ ' + msg;
+  errorMsg.classList.add('show');
+}
+
+function poll(jobId){
+  if(polling) clearInterval(polling);
+  polling = setInterval(async () => {
+    const res = await fetch('/api/status/' + jobId);
+    const job = await res.json();
+    statusText.textContent = job.status;
+    percentText.textContent = (job.percent || 0) + '%';
+    setBar(job.percent || 0);
+
+    if(job.status === 'finished'){
+      clearInterval(polling);
+      downloadBtn.disabled = false;
+      progressWrap.classList.remove('show');
+      urlInput.value = '';
+      loadVideos();
+    } else if(job.status === 'error'){
+      clearInterval(polling);
+      downloadBtn.disabled = false;
+      progressWrap.classList.remove('show');
+      showError(job.error || 'download failed');
+    }
+  }, 800);
+}
+
+urlInput.addEventListener('keydown', e => { if(e.key === 'Enter') downloadBtn.click(); });
+
+loadVideos();
+</script>
+</body>
+</html>
