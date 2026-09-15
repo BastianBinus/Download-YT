@@ -1,10 +1,10 @@
-# 🐸 Swamp Grabber
+# Video Downloader
 
-Ein kleines, lokales Web-Tool zum **Herunterladen und Ansehen von Videos** – mit einer
-animierten 8-Bit-Sumpf-Oberfläche (Frösche, Fluss, Glühwürmchen). Läuft auf deinem PC
-und lässt sich vom Handy im selben WLAN bedienen.
+Ein kleines, lokales Web-Tool zum **Herunterladen und Ansehen von Videos**. Läuft auf
+deinem PC und lässt sich vom Handy im selben WLAN bedienen. Schlichte, aufgeräumte
+Oberfläche.
 
-![Swamp Grabber UI](docs/screenshot.png)
+![Video Downloader UI](docs/screenshot.png)
 
 ---
 
@@ -31,7 +31,6 @@ und lässt sich vom Handy im selben WLAN bedienen.
 - ▶️ **Videos direkt im Browser ansehen** – auch am Handy.
 - 💾 **Auf das Gerät speichern** oder wieder **löschen**.
 - 📱 **Handy-tauglich** – bedienbar über den Browser im selben WLAN.
-- 🎮 Animierter Sumpf-Hintergrund im Retro-Look.
 
 Die Videos werden als **MP4 (H.264/AAC)** gespeichert – das läuft auf praktisch jedem
 Handy, Tablet und Fernseher.
@@ -79,7 +78,7 @@ Beim Start zeigt das Tool die Adressen an, unter denen es erreichbar ist:
 
 ```
 ==================================================
-  Swamp Grabber is hopping!
+  Video Downloader is running
   On this PC:   http://127.0.0.1:5000
   On your phone (same WiFi): http://192.168.1.39:5000
 ==================================================
@@ -108,12 +107,12 @@ Zum Beenden: `Strg + C` im Terminal.
 
 1. **Link einfügen** – kopiere die URL eines Videos (z. B. von YouTube) in das Eingabefeld
    `https://... video link`.
-2. **„⬇ GRAB" drücken** – der Download startet, ein Fortschrittsbalken füllt sich.
-3. Nach dem Download taucht das Video unten in **„YOUR SWAMP LIBRARY"** auf. Dort gibt es
+2. **„Download" drücken** – der Download startet, ein Fortschrittsbalken füllt sich.
+3. Nach dem Download taucht das Video unten unter **„Your library"** auf. Dort gibt es
    pro Video drei Knöpfe:
-   - **▶ WATCH** – Video direkt im Browser abspielen (öffnet einen Player).
-   - **⭳ SAVE** – Datei auf dein Gerät (Handy/PC) herunterladen.
-   - **✕ DELETE** – Video vom PC löschen (mit Rückfrage).
+   - **Watch** – Video direkt im Browser abspielen (öffnet einen Player).
+   - **Save** – Datei auf dein Gerät (Handy/PC) herunterladen.
+   - **Delete** – Video vom PC löschen (mit Rückfrage).
 
 Alle bereits vorhandenen Videos im Download-Ordner werden beim Öffnen automatisch angezeigt.
 
@@ -158,8 +157,8 @@ kompatibel), kann das Format-Feld anpassen – siehe die
 Download-YT/
 ├── app.py                 # Flask-Server + Download-Logik (yt-dlp)
 ├── templates/
-│   ├── index.html         # Oberfläche + animierter Sumpf-Hintergrund
-│   └── 404.html           # Eigene 404-Seite
+│   ├── index.html         # Oberfläche
+│   └── 404.html           # 404-Seite
 ├── requirements.txt       # Python-Abhängigkeiten (flask, yt-dlp)
 ├── downloads/             # heruntergeladene Videos (wird angelegt, nicht im Repo)
 ├── main.py                # ursprüngliches CLI-Skript (frag per Terminal nach URL)
@@ -210,5 +209,3 @@ Der Link muss mit `http://` oder `https://` beginnen.
   im Heimnetz** gedacht – nicht dafür, offen ins Internet gestellt zu werden.
 - Lade nur Inhalte herunter, zu denen du berechtigt bist. Beachte die Nutzungsbedingungen
   der jeweiligen Plattform und das Urheberrecht.
-
-Viel Spaß im Sumpf. 🐸

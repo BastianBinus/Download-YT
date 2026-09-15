@@ -156,7 +156,7 @@ def local_ip():
 if __name__ == "__main__":
     ip = local_ip()
     print("=" * 50)
-    print("  Swamp Grabber is hopping!")
+    print("  Video Downloader is running")
     print(f"  On this PC:   http://127.0.0.1:5000")
     print(f"  On your phone (same WiFi): http://{ip}:5000")
     print("=" * 50)

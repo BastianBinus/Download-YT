@@ -2,197 +2,160 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Swamp Grabber</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video Downloader</title>
 <style>
   :root{
-    --panel: #1c2a1e;
-    --panel-light: #263524;
-    --ink: #cdd6bd;
-    --accent: #c9a24b;
-    --accent-dark: #8a6d28;
-    --frog: #6f8f4f;
-    --danger: #b05545;
-    --border: #10160e;
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --text: #1f2328;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --border: #d7dbe0;
+    --danger: #dc2626;
+    --track: #e5e7eb;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg: #16181c;
+      --card: #1f2227;
+      --text: #e6e8eb;
+      --muted: #9aa1ab;
+      --accent: #3b82f6;
+      --accent-hover: #60a5fa;
+      --border: #33383f;
+      --danger: #ef4444;
+      --track: #33383f;
+    }
   }
   *{box-sizing:border-box;}
   html,body{
-    margin:0; padding:0; height:100%;
-    background:#0d130d;
-    color:var(--ink);
-    font-family:'Press Start 2P', 'Courier New', monospace;
-    overflow-x:hidden;
-  }
-  #bg{
-    position:fixed; inset:0; width:100%; height:100%;
-    z-index:0; display:block;
-    image-rendering: pixelated;
+    margin:0; min-height:100%;
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:15px; line-height:1.5;
   }
   .wrap{
-    position:relative; z-index:1;
-    min-height:100vh;
-    display:flex; flex-direction:column; align-items:center;
-    padding:20px 12px 60px;
+    max-width:640px; margin:0 auto;
+    padding:32px 16px 60px;
   }
-  .title{
-    font-size: clamp(18px, 5vw, 30px);
-    color: var(--accent);
-    text-shadow: 3px 3px 0 var(--border), 6px 6px 0 rgba(0,0,0,.3);
-    letter-spacing: 2px;
-    text-align:center;
-    margin: 10px 0 4px;
+  h1{
+    font-size:22px; font-weight:650; margin:0 0 4px;
   }
-  .subtitle{
-    font-size: 10px;
-    color: var(--ink);
-    opacity:.8;
-    text-align:center;
-    margin-bottom: 22px;
+  .subtitle{ color:var(--muted); font-size:14px; margin-bottom:24px; }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:18px;
+    margin-bottom:20px;
   }
-  .panel{
-    width:100%; max-width: 520px;
-    background: var(--panel);
-    border: 4px solid var(--border);
-    box-shadow:
-      0 0 0 4px var(--panel-light) inset,
-      8px 8px 0 rgba(0,0,0,.45);
-    padding: 18px;
-    margin-bottom: 22px;
-  }
-  .row{
-    display:flex; gap:8px; flex-wrap:wrap;
-  }
+
+  .row{ display:flex; gap:8px; flex-wrap:wrap; }
   input[type=text]{
-    flex: 1 1 200px;
-    font-family: inherit;
-    font-size: 11px;
-    padding: 14px 10px;
-    background: #04160e;
-    color: var(--ink);
-    border: 3px solid var(--border);
-    outline: none;
+    flex:1 1 200px;
+    font:inherit;
+    padding:12px 12px;
+    color:var(--text);
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    outline:none;
   }
-  input[type=text]:focus{
-    border-color: var(--accent);
-  }
+  input[type=text]:focus{ border-color:var(--accent); }
+
   button{
-    font-family: inherit;
-    font-size: 11px;
-    cursor:pointer;
-    padding: 14px 16px;
-    color: var(--border);
-    background: var(--accent);
-    border: 3px solid var(--border);
-    box-shadow: 4px 4px 0 rgba(0,0,0,.45);
-    white-space: nowrap;
-    touch-action: manipulation;
+    font:inherit; font-weight:600; cursor:pointer;
+    padding:12px 18px;
+    color:#fff; background:var(--accent);
+    border:none; border-radius:8px;
+    white-space:nowrap; touch-action:manipulation;
   }
-  button:active{
-    box-shadow: 1px 1px 0 rgba(0,0,0,.45);
-    transform: translate(3px,3px);
-  }
-  button.small{
-    font-size: 9px;
-    padding: 10px 10px;
-  }
-  button.danger{ background: var(--danger); color: #fff; }
-  button:disabled{ opacity:.5; cursor:default; }
+  button:hover{ background:var(--accent-hover); }
+  button:disabled{ opacity:.55; cursor:default; }
+  button.small{ padding:8px 12px; font-size:13px; }
+  button.ghost{ background:transparent; color:var(--accent); border:1px solid var(--border); }
+  button.ghost:hover{ background:var(--track); }
+  button.danger{ background:transparent; color:var(--danger); border:1px solid var(--border); }
+  button.danger:hover{ background:var(--track); }
 
   .progress-wrap{ margin-top:16px; display:none; }
   .progress-wrap.show{ display:block; }
   .status-line{
-    font-size: 9px; margin-bottom:8px; opacity:.9;
+    font-size:13px; color:var(--muted); margin-bottom:8px;
     display:flex; justify-content:space-between;
   }
-  .bar{
-    display:flex; gap:2px; height:20px;
-    border:3px solid var(--border); padding:2px; background:#04160e;
+  .track{
+    height:10px; background:var(--track);
+    border-radius:6px; overflow:hidden;
   }
-  .bar span{
-    flex:1; background: transparent;
+  .track > div{
+    height:100%; width:0%;
+    background:var(--accent);
+    transition:width .3s ease;
   }
-  .bar span.on{ background: var(--frog); }
-  .error-msg{
-    color: var(--danger); font-size:9px; margin-top:10px; display:none;
-  }
+  .error-msg{ color:var(--danger); font-size:13px; margin-top:10px; display:none; }
   .error-msg.show{ display:block; }
 
-  .section-title{
-    font-size: 13px; color: var(--accent); margin-bottom: 14px;
-  }
-  .empty{
-    font-size: 10px; opacity:.7; line-height:1.8;
-  }
+  .section-title{ font-size:16px; font-weight:650; margin-bottom:14px; }
+  .empty{ color:var(--muted); font-size:14px; }
+
   .video-item{
-    border: 3px solid var(--border);
-    background: var(--panel-light);
-    padding: 10px;
-    margin-bottom: 10px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:10px;
   }
-  .video-name{
-    font-size: 9px; line-height:1.6; word-break: break-word; margin-bottom:8px;
-  }
-  .video-meta{
-    font-size: 8px; opacity:.7; margin-bottom: 10px;
-  }
+  .video-name{ font-size:14px; font-weight:550; word-break:break-word; margin-bottom:4px; }
+  .video-meta{ font-size:12px; color:var(--muted); margin-bottom:12px; }
   .video-actions{ display:flex; gap:8px; flex-wrap:wrap; }
   .video-actions a{ text-decoration:none; }
 
   #modal{
     position:fixed; inset:0; z-index:10;
-    background: rgba(2,10,6,.92);
+    background:rgba(0,0,0,.8);
     display:none; align-items:center; justify-content:center;
-    padding: 16px;
+    padding:16px;
   }
   #modal.show{ display:flex; }
   .player-box{
-    width:100%; max-width: 800px;
-    border: 4px solid var(--border);
-    box-shadow: 0 0 0 4px var(--panel-light) inset;
-    background:#000;
-    padding: 4px;
+    width:100%; max-width:900px;
+    background:#000; border-radius:10px; overflow:hidden;
   }
-  .player-box video{ width:100%; display:block; max-height:70vh; background:#000; }
-  .modal-close{
-    display:block; margin: 14px auto 0;
-  }
+  .player-box video{ width:100%; display:block; max-height:75vh; background:#000; }
+  .modal-close{ display:block; margin:14px auto 0; }
 
-  footer{
-    position:relative; z-index:1;
-    font-size: 8px; opacity:.55; text-align:center; padding: 10px;
-  }
+  footer{ color:var(--muted); font-size:12px; text-align:center; padding:8px; }
 </style>
 </head>
 <body>
-<canvas id="bg"></canvas>
-
 <div class="wrap">
-  <div class="title">SWAMP&nbsp;GRABBER</div>
-  <div class="subtitle">paste a link. catch the video. watch it anywhere.</div>
+  <h1>Video Downloader</h1>
+  <div class="subtitle">Paste a link, download the video, watch it anywhere.</div>
 
-  <div class="panel">
+  <div class="card">
     <div class="row">
       <input id="url" type="text" placeholder="https://... video link" autocomplete="off" autocapitalize="off" spellcheck="false">
-      <button id="downloadBtn">⬇ GRAB</button>
+      <button id="downloadBtn">Download</button>
     </div>
     <div class="progress-wrap" id="progressWrap">
       <div class="status-line">
         <span id="statusText">queued</span>
         <span id="percentText">0%</span>
       </div>
-      <div class="bar" id="bar"></div>
+      <div class="track"><div id="trackFill"></div></div>
     </div>
     <div class="error-msg" id="errorMsg"></div>
   </div>
 
-  <div class="panel">
-    <div class="section-title">YOUR SWAMP LIBRARY</div>
-    <div id="videoList"><div class="empty">no videos yet... go catch one!</div></div>
+  <div class="card">
+    <div class="section-title">Your library</div>
+    <div id="videoList"><div class="empty">No videos yet — download one above.</div></div>
   </div>
 
-  <footer>runs locally &middot; files live in /downloads</footer>
+  <footer>Runs locally &middot; files saved in /downloads</footer>
 </div>
 
 <div id="modal">
@@ -200,210 +163,23 @@
     <div class="player-box">
       <video id="player" controls playsinline></video>
     </div>
-    <button class="modal-close" id="closeModal">✕ CLOSE</button>
+    <button class="modal-close ghost" id="closeModal">Close</button>
   </div>
 </div>
 
 <script>
-/* ---------- swamp background animation (original pixel art) ---------- */
-(function(){
-  const canvas = document.getElementById('bg');
-  const ctx = canvas.getContext('2d');
-  let W, H, UNIT;
-
-  function resize(){
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-    UNIT = Math.max(3, Math.round(Math.min(W, H) / 90));
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
-  function px(x, y, w, h, color){
-    ctx.fillStyle = color;
-    ctx.fillRect(Math.round(x/UNIT)*UNIT, Math.round(y/UNIT)*UNIT, Math.ceil(w/UNIT)*UNIT, Math.ceil(h/UNIT)*UNIT);
-  }
-
-  // fireflies
-  const fireflies = Array.from({length: 18}, () => ({
-    x: Math.random(), y: Math.random()*0.55,
-    phase: Math.random()*Math.PI*2, speed: 0.6+Math.random()*0.8
-  }));
-
-  // lily pads (position as fraction of width, sit on the river)
-  const pads = [0.12, 0.30, 0.48, 0.66, 0.84].map((x,i) => ({
-    x, bob: Math.random()*Math.PI*2, size: 2.4 + (i%2)*0.6
-  }));
-
-  // reeds along the bottom edges
-  const reeds = [];
-  for(let i=0;i<14;i++){
-    reeds.push({x: Math.random(), h: 3+Math.random()*4, side: Math.random()<0.5?0:1});
-  }
-
-  // frogs: sit on a pad index, hop to another occasionally
-  const FROG_COLORS = ['#6f8f4f', '#5c7a42', '#7d9a58'];
-  const frogs = [0,1,2].map((n,i) => ({
-    from: i % pads.length,
-    to: i % pads.length,
-    t: 1,               // 0..1 progress of current hop, 1 = resting
-    waitUntil: performance.now() + 1000 + Math.random()*4000,
-    color: FROG_COLORS[i % FROG_COLORS.length],
-    facing: 1
-  }));
-
-  const ripples = [];
-
-  function padPos(pad){
-    const riverTop = H*0.62;
-    return {
-      x: pad.x * W,
-      y: riverTop + (H - riverTop) * 0.35 + Math.sin(performance.now()/700 + pad.bob) * UNIT
-    };
-  }
-
-  function drawFrog(cx, cy, scale, color, squash){
-    // simple original blocky frog, drawn from unit blocks
-    const s = UNIT * scale;
-    const bodyW = 5*s, bodyH = (3*s) * squash;
-    const x0 = cx - bodyW/2, y0 = cy - bodyH;
-    // body
-    px(x0, y0, bodyW, bodyH, color);
-    // belly
-    px(x0 + s, y0 + bodyH - s, bodyW - 2*s, s, '#d8dcc4');
-    // eyes (bumps on top)
-    px(x0 + s*0.5, y0 - s*0.8, s*1.1, s*1.1, color);
-    px(x0 + bodyW - s*1.6, y0 - s*0.8, s*1.1, s*1.1, color);
-    px(x0 + s*0.75, y0 - s*0.55, s*0.5, s*0.5, '#0a1a0a');
-    px(x0 + bodyW - s*1.35, y0 - s*0.55, s*0.5, s*0.5, '#0a1a0a');
-    // legs
-    px(x0 - s*0.6, y0 + bodyH - s*0.8, s*0.8, s*0.8, color);
-    px(x0 + bodyW - s*0.2, y0 + bodyH - s*0.8, s*0.8, s*0.8, color);
-  }
-
-  function step(ts){
-    // sky gradient
-    const g = ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0, '#141d15');
-    g.addColorStop(0.6, '#1a2618');
-    g.addColorStop(1, '#22301f');
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,W,H);
-
-    // fireflies
-    fireflies.forEach(f => {
-      const alpha = 0.2 + 0.35 * Math.abs(Math.sin(ts/600 * f.speed + f.phase));
-      ctx.fillStyle = `rgba(205, 190, 125, ${alpha.toFixed(2)})`;
-      const fx = f.x * W + Math.sin(ts/1500 + f.phase)*UNIT*3;
-      const fy = f.y * H + Math.cos(ts/1800 + f.phase)*UNIT*2;
-      ctx.fillRect(Math.round(fx/UNIT)*UNIT, Math.round(fy/UNIT)*UNIT, UNIT, UNIT);
-    });
-
-    // distant reeds/cattails
-    reeds.forEach(r => {
-      const baseY = H;
-      const rx = r.x * W;
-      const rh = r.h * UNIT * 3;
-      px(rx, baseY - rh, UNIT, rh, '#2a3a22');
-      px(rx - UNIT, baseY - rh*0.6, UNIT, rh*0.6, '#1f2c1a');
-      px(rx - UNIT*0.5, baseY - rh - UNIT*2, UNIT*2, UNIT*2, '#3a4a28');
-    });
-
-    // river band
-    const riverTop = H * 0.62;
-    px(0, riverTop, W, H - riverTop, '#2f3d33');
-    const stripeW = UNIT * 6;
-    const offset = (ts/40) % (stripeW*2);
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(0, riverTop, W, H - riverTop);
-    ctx.clip();
-    for(let x = -stripeW*2 + offset; x < W + stripeW*2; x += stripeW*2){
-      px(x, riverTop + UNIT*2, stripeW, UNIT, '#3b4a3c');
-      px(x + stripeW, riverTop + UNIT*5, stripeW, UNIT, '#354436');
-      px(x + stripeW*0.5, riverTop + UNIT*9, stripeW, UNIT, '#3b4a3c');
-    }
-    ctx.restore();
-
-    // lily pads
-    pads.forEach(pad => {
-      const p = padPos(pad);
-      const r = UNIT * pad.size;
-      px(p.x - r, p.y - r*0.4, r*2, r*0.8, '#4a6b3a');
-      px(p.x - r*0.6, p.y - r*0.55, r*1.2, r*0.3, '#5a7d46');
-    });
-
-    // ripples
-    for(let i = ripples.length-1; i>=0; i--){
-      const rp = ripples[i];
-      rp.r += 0.6;
-      rp.life -= 0.02;
-      if(rp.life <= 0){ ripples.splice(i,1); continue; }
-      ctx.strokeStyle = `rgba(180,195,170,${(rp.life*0.6).toFixed(2)})`;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(rp.x, rp.y, rp.r*UNIT, 0, Math.PI*2);
-      ctx.stroke();
-    }
-
-    // frogs: state machine (idle -> hop -> idle)
-    frogs.forEach(frog => {
-      if(frog.t >= 1 && ts > frog.waitUntil){
-        frog.from = frog.to;
-        let next = frog.to;
-        while(next === frog.from) next = Math.floor(Math.random()*pads.length);
-        frog.facing = next > frog.from ? 1 : -1;
-        frog.to = next;
-        frog.t = 0;
-        frog.hopStart = ts;
-      }
-      let squash = 1, cx, cy;
-      const a = padPos(pads[frog.from]);
-      const b = padPos(pads[frog.to]);
-      if(frog.t < 1){
-        frog.t = Math.min(1, (ts - frog.hopStart) / 500);
-        const arc = Math.sin(frog.t * Math.PI) * UNIT * 6;
-        cx = a.x + (b.x - a.x) * frog.t;
-        cy = a.y + (b.y - a.y) * frog.t - arc;
-        squash = 0.75 + Math.sin(frog.t*Math.PI)*0.25;
-        if(frog.t >= 1){
-          frog.waitUntil = ts + 1500 + Math.random()*4000;
-          ripples.push({x: b.x, y: b.y, r: 0.5, life: 0.6});
-        }
-      } else {
-        cx = a.x; cy = a.y;
-        squash = 1 + Math.sin(ts/300)*0.03;
-      }
-      drawFrog(cx, cy, 1.4, frog.color, squash);
-    });
-
-    requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-})();
-
-/* ---------- app logic ---------- */
 const urlInput = document.getElementById('url');
 const downloadBtn = document.getElementById('downloadBtn');
 const progressWrap = document.getElementById('progressWrap');
 const statusText = document.getElementById('statusText');
 const percentText = document.getElementById('percentText');
-const bar = document.getElementById('bar');
+const trackFill = document.getElementById('trackFill');
 const errorMsg = document.getElementById('errorMsg');
 const videoList = document.getElementById('videoList');
 const modal = document.getElementById('modal');
 const player = document.getElementById('player');
 
-const BAR_SEGMENTS = 24;
-for(let i=0;i<BAR_SEGMENTS;i++){
-  const s = document.createElement('span');
-  bar.appendChild(s);
-}
-
-function setBar(percent){
-  const filled = Math.round((percent/100) * BAR_SEGMENTS);
-  [...bar.children].forEach((el, i) => el.classList.toggle('on', i < filled));
-}
+function setBar(percent){ trackFill.style.width = (percent || 0) + '%'; }
 
 function fmtSize(bytes){
   if(bytes > 1024*1024*1024) return (bytes/1024/1024/1024).toFixed(2) + ' GB';
@@ -414,7 +190,7 @@ async function loadVideos(){
   const res = await fetch('/api/videos');
   const videos = await res.json();
   if(!videos.length){
-    videoList.innerHTML = '<div class="empty">no videos yet... go catch one!</div>';
+    videoList.innerHTML = '<div class="empty">No videos yet — download one above.</div>';
     return;
   }
   videoList.innerHTML = '';
@@ -425,9 +201,9 @@ async function loadVideos(){
       <div class="video-name">${v.name}</div>
       <div class="video-meta">${fmtSize(v.size)}</div>
       <div class="video-actions">
-        <button class="small watch-btn">▶ WATCH</button>
-        <a href="/videos/${encodeURIComponent(v.name)}" download="${v.name}"><button class="small">⭳ SAVE</button></a>
-        <button class="small danger del-btn">✕ DELETE</button>
+        <button class="small watch-btn">Watch</button>
+        <a href="/videos/${encodeURIComponent(v.name)}" download="${v.name}"><button class="small ghost">Save</button></a>
+        <button class="small danger del-btn">Delete</button>
       </div>
     `;
     item.querySelector('.watch-btn').addEventListener('click', () => {
@@ -484,7 +260,7 @@ downloadBtn.addEventListener('click', async () => {
 });
 
 function showError(msg){
-  errorMsg.textContent = '⚠ ' + msg;
+  errorMsg.textContent = msg;
   errorMsg.classList.add('show');
 }
 
