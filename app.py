@@ -73,6 +73,11 @@ def index():
     return render_template("index.html")
 
 
+@app.errorhandler(404)
+def not_found(_e):
+    return render_template("404.html"), 404
+
+
 @app.route("/api/download", methods=["POST"])
 def api_download():
     data = request.get_json(force=True, silent=True) or {}

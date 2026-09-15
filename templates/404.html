@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404 — Swamp Grabber</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --panel: #1c2a1e;
+    --panel-light: #263524;
+    --ink: #cdd6bd;
+    --accent: #c9a24b;
+    --frog: #6f8f4f;
+    --border: #10160e;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; height:100%;
+    background:#141d15;
+    color:var(--ink);
+    font-family:'Press Start 2P','Courier New',monospace;
+  }
+  .wrap{
+    min-height:100vh;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    text-align:center; padding:24px 16px; gap:22px;
+  }
+  .code{
+    font-size: clamp(40px, 16vw, 96px);
+    color:var(--accent);
+    text-shadow:3px 3px 0 var(--border), 6px 6px 0 rgba(0,0,0,.3);
+    letter-spacing:4px;
+  }
+  .msg{ font-size:11px; line-height:1.9; max-width:420px; opacity:.9; }
+  .frog{
+    display:grid;
+    grid-template-columns:repeat(8, var(--u));
+    grid-template-rows:repeat(7, var(--u));
+    --u:14px; gap:0;
+  }
+  .frog i{ width:var(--u); height:var(--u); }
+  .g{ background:var(--frog); }
+  .d{ background:#0a1a0a; }
+  .b{ background:#d8dcc4; }
+  a.home{
+    text-decoration:none;
+  }
+  button{
+    font-family:inherit; font-size:11px; cursor:pointer;
+    padding:14px 18px; color:var(--border); background:var(--accent);
+    border:3px solid var(--border); box-shadow:4px 4px 0 rgba(0,0,0,.45);
+  }
+  button:active{ transform:translate(3px,3px); box-shadow:1px 1px 0 rgba(0,0,0,.45); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="code">404</div>
+
+  <!-- a lost pixel frog -->
+  <div class="frog" aria-hidden="true">
+    <i></i><i></i><i class="g"></i><i></i><i></i><i class="g"></i><i></i><i></i>
+    <i></i><i></i><i class="g"></i><i class="d"></i><i class="d"></i><i class="g"></i><i></i><i></i>
+    <i></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i></i>
+    <i></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i></i>
+    <i></i><i class="g"></i><i class="b"></i><i class="b"></i><i class="b"></i><i class="b"></i><i class="g"></i><i></i>
+    <i></i><i></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i></i><i></i>
+    <i class="g"></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="g"></i>
+  </div>
+
+  <div class="msg">this frog hopped somewhere that doesn't exist.<br>let's get back to the swamp.</div>
+
+  <a class="home" href="/"><button>&larr; BACK TO THE SWAMP</button></a>
+</div>
+</body>
+</html>

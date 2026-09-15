@@ -8,19 +8,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   :root{
-    --panel: #0e2b1c;
-    --panel-light: #163a26;
-    --ink: #d8f7c8;
-    --accent: #ffd23f;
-    --accent-dark: #b3860b;
-    --frog: #4caf50;
-    --danger: #e05252;
-    --border: #05130a;
+    --panel: #1c2a1e;
+    --panel-light: #263524;
+    --ink: #cdd6bd;
+    --accent: #c9a24b;
+    --accent-dark: #8a6d28;
+    --frog: #6f8f4f;
+    --danger: #b05545;
+    --border: #10160e;
   }
   *{box-sizing:border-box;}
   html,body{
     margin:0; padding:0; height:100%;
-    background:#04160e;
+    background:#0d130d;
     color:var(--ink);
     font-family:'Press Start 2P', 'Courier New', monospace;
     overflow-x:hidden;
@@ -242,7 +242,7 @@
   }
 
   // frogs: sit on a pad index, hop to another occasionally
-  const FROG_COLORS = ['#4caf50', '#3f9142', '#5fc766'];
+  const FROG_COLORS = ['#6f8f4f', '#5c7a42', '#7d9a58'];
   const frogs = [0,1,2].map((n,i) => ({
     from: i % pads.length,
     to: i % pads.length,
@@ -270,7 +270,7 @@
     // body
     px(x0, y0, bodyW, bodyH, color);
     // belly
-    px(x0 + s, y0 + bodyH - s, bodyW - 2*s, s, '#eaffdf');
+    px(x0 + s, y0 + bodyH - s, bodyW - 2*s, s, '#d8dcc4');
     // eyes (bumps on top)
     px(x0 + s*0.5, y0 - s*0.8, s*1.1, s*1.1, color);
     px(x0 + bodyW - s*1.6, y0 - s*0.8, s*1.1, s*1.1, color);
@@ -284,16 +284,16 @@
   function step(ts){
     // sky gradient
     const g = ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0, '#081a12');
-    g.addColorStop(0.6, '#0a2417');
-    g.addColorStop(1, '#0f3320');
+    g.addColorStop(0, '#141d15');
+    g.addColorStop(0.6, '#1a2618');
+    g.addColorStop(1, '#22301f');
     ctx.fillStyle = g;
     ctx.fillRect(0,0,W,H);
 
     // fireflies
     fireflies.forEach(f => {
-      const alpha = 0.35 + 0.5 * Math.abs(Math.sin(ts/600 * f.speed + f.phase));
-      ctx.fillStyle = `rgba(255, 230, 140, ${alpha.toFixed(2)})`;
+      const alpha = 0.2 + 0.35 * Math.abs(Math.sin(ts/600 * f.speed + f.phase));
+      ctx.fillStyle = `rgba(205, 190, 125, ${alpha.toFixed(2)})`;
       const fx = f.x * W + Math.sin(ts/1500 + f.phase)*UNIT*3;
       const fy = f.y * H + Math.cos(ts/1800 + f.phase)*UNIT*2;
       ctx.fillRect(Math.round(fx/UNIT)*UNIT, Math.round(fy/UNIT)*UNIT, UNIT, UNIT);
@@ -304,14 +304,14 @@
       const baseY = H;
       const rx = r.x * W;
       const rh = r.h * UNIT * 3;
-      px(rx, baseY - rh, UNIT, rh, '#123d24');
-      px(rx - UNIT, baseY - rh*0.6, UNIT, rh*0.6, '#0d2e1a');
-      px(rx - UNIT*0.5, baseY - rh - UNIT*2, UNIT*2, UNIT*2, '#2f5a1f');
+      px(rx, baseY - rh, UNIT, rh, '#2a3a22');
+      px(rx - UNIT, baseY - rh*0.6, UNIT, rh*0.6, '#1f2c1a');
+      px(rx - UNIT*0.5, baseY - rh - UNIT*2, UNIT*2, UNIT*2, '#3a4a28');
     });
 
     // river band
     const riverTop = H * 0.62;
-    px(0, riverTop, W, H - riverTop, '#0c3348');
+    px(0, riverTop, W, H - riverTop, '#2f3d33');
     const stripeW = UNIT * 6;
     const offset = (ts/40) % (stripeW*2);
     ctx.save();
@@ -319,9 +319,9 @@
     ctx.rect(0, riverTop, W, H - riverTop);
     ctx.clip();
     for(let x = -stripeW*2 + offset; x < W + stripeW*2; x += stripeW*2){
-      px(x, riverTop + UNIT*2, stripeW, UNIT, '#134a63');
-      px(x + stripeW, riverTop + UNIT*5, stripeW, UNIT, '#0f3d55');
-      px(x + stripeW*0.5, riverTop + UNIT*9, stripeW, UNIT, '#134a63');
+      px(x, riverTop + UNIT*2, stripeW, UNIT, '#3b4a3c');
+      px(x + stripeW, riverTop + UNIT*5, stripeW, UNIT, '#354436');
+      px(x + stripeW*0.5, riverTop + UNIT*9, stripeW, UNIT, '#3b4a3c');
     }
     ctx.restore();
 
@@ -329,8 +329,8 @@
     pads.forEach(pad => {
       const p = padPos(pad);
       const r = UNIT * pad.size;
-      px(p.x - r, p.y - r*0.4, r*2, r*0.8, '#2f7a34');
-      px(p.x - r*0.6, p.y - r*0.55, r*1.2, r*0.3, '#3f9142');
+      px(p.x - r, p.y - r*0.4, r*2, r*0.8, '#4a6b3a');
+      px(p.x - r*0.6, p.y - r*0.55, r*1.2, r*0.3, '#5a7d46');
     });
 
     // ripples
@@ -339,7 +339,7 @@
       rp.r += 0.6;
       rp.life -= 0.02;
       if(rp.life <= 0){ ripples.splice(i,1); continue; }
-      ctx.strokeStyle = `rgba(200,240,255,${rp.life})`;
+      ctx.strokeStyle = `rgba(180,195,170,${(rp.life*0.6).toFixed(2)})`;
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(rp.x, rp.y, rp.r*UNIT, 0, Math.PI*2);
